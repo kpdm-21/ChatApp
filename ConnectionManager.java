@@ -65,4 +65,17 @@ public class ConnectionManager {
             System.out.println((i + 1) + "     " + handler.getClientAddress() + "        " + handler.getClientPort());
         }
     }
+
+    //// Terminates a connection by its index (1-based ID) -v1 haha i'm scared
+    public void terminateConnection(int id) {
+        if (id < 1 || id > connections.size()) {
+            System.out.println("Error: Invalid connection ID.");
+            return;
+        }
+        //// Get the connection handler
+        ConnectionHandler handler = connections.get(id - 1);
+        handler.closeConnection(); //// Close the socket
+        connections.remove(id - 1); //// Remove from the list, it's a list right?
+        System.out.println("Connection to " + handler.getClientAddress() + " terminated.");
+    }
 }

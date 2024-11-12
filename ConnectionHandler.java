@@ -39,6 +39,8 @@ public class ConnectionHandler {
     // implement terminate command
     public void closeConnection() {
         try {
+            //// Need the callout for later testing -sorry
+            System.out.println("Connection to " + clientAddress + " has been closed.");
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

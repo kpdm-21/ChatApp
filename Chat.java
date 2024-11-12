@@ -64,6 +64,7 @@ public class Chat {
         commands.put("myport", () -> System.out.println("Listening on port: " + serverSocket.getLocalPort()));
         commands.put("list", connectionManager::listConnections);
         commands.put("help", Chat::displayHelp);
+        ////commands.put("terminate", () -> processTerminateCommand());
     }
 
     // main loop to handle user commands and execute relevant actions
@@ -111,7 +112,7 @@ public class Chat {
         System.out.println("myport              - Display the port you are listening on");
         System.out.println("connect <IP> <port> - Connect to another peer");
         System.out.println("list                - List active connections");
-        System.out.println("terminate <ID>      - terminate connection"); // not yet implemented
+        System.out.println("terminate <ID>      - terminate connection"); // low run implementation
         System.out.println("send <ID> <message> - Send a new message"); // not yet implemented
         System.out.println("exit                - Exit the application"); // not yet implemented
 
@@ -143,5 +144,13 @@ public class Chat {
                 System.out.println("Error accepting connection: " + e.getMessage());
             }
         }
+    }
+
+    //// Process the terminate command - v1
+    private static void processTerminateCommand() {
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Enter connection ID to terminate: ");
+    int connectionId = scanner.nextInt();
+    connectionManager.terminateConnection(connectionId);
     }
 }
