@@ -60,11 +60,11 @@ Member 2: Natalia Chavez
 
 5. Example Usage
 
-	•	View help: Type help to see all available commands and descriptions.
-	•	Get Local IP Address: Type myip.
-	•	Get Listening Port: Type myport.
-	•	Connect to a Peer: Type connect <IP> <port>.
-	•	List Active Connections: Type list.
-	•	Terminate connection: Type terminate <connection id>
-	•	Send Messages: Type send <connection id> <message>
-	•	To exit and close all connections : Type exit
+1. View help: Type help to see all available commands and descriptions.
+2. Get Local IP Address: Type myip.
+3. Get Listening Port: Type myport.
+4. Connect to a Peer: Type connect <IP> <port>.
+5. List Active Connections: Type list.
+6. Terminate connection: Type terminate <connection id>
+7. Send Messages: Type send <connection id> <message>
+8. To exit and close all connections : Type exit
