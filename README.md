@@ -41,24 +41,25 @@ Member 2: Natalia Chavez
 
 # Project Setup and Build Instructions
 
-1.	Download the Project Files:
-     - Class.Java
-     - ConnectionHandler.Java
-     - ConnectionManager.Java
-     - Makefile
-     
-2.	Compile the Program:
-	•	Open a terminal or command prompt.
-	•	Navigate to the project directory where the Makefile and .java files are located.
-	•	Run the following command to compile all Java files: make 
+### 1.	Download the Project Files:
+- Class.Java
+- ConnectionHandler.Java
+- ConnectionManager.Java
+- Makefile
+       
+#### 2.	Compile the Program:
+- Open a terminal or command prompt.
+- Navigate to the project directory where the `Makefile` and `.java` files are located.
+- Run the following command in the terminal to compile all Java files: make
 
-3. In the terminal, start the program with: make run port=<port>
-    Replace <port> with the desired port number (example: make run port=4321)
+### 3. Start the Program:
+- In the terminal, start the program with: make run port=<port>
+- Replace `<port>` with the desired port number (example: `make run port=4321`).
+  
+### 4. Using Commands in the Chat application:
+- Type `help` in the prompt to see available commands.
 
-4. Using Commands in the Chat application:
-	•	Type help in the prompt to see available commands.
-
-5. Example Usage
+### 5. Example Usage
 
 - View help: Type `help` to see all available commands and descriptions.
 - Get Local IP Address: Type `myip`.
