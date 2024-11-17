@@ -31,12 +31,23 @@ public class Chat {
     // sets up the server and starts listening for commands and connections
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Usage: java Chat <port>");
+            System.out.println("Usage: java Chat, listening on <port>");
             return;
         }
 
         // parse the provided port number
-        int port = Integer.parseInt(args[0]);
+        int port;
+        try {
+            port = Integer.parseInt(args[0]);
+            if (port < 1024 || port > 65535) {
+                System.out.println("Error: Invalid port number. Please use a port number between 1024 and 65535.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Port must be an integer.");
+            return;
+        }
+
         connectionManager = new ConnectionManager();
 
         try {
@@ -58,6 +69,7 @@ public class Chat {
         }
     }
 
+
     // method to initialize all supported commands with corresponding actions
     private static void initializeCommands() {
         commands.put("myip", Chat::myip);
@@ -65,7 +77,7 @@ public class Chat {
         commands.put("list", connectionManager::listConnections);
         commands.put("help", Chat::displayHelp);
         commands.put("terminate", () -> processTerminateCommand());
-        commands.put("send", () -> processSendCommand()); 
+        commands.put("send", () -> processSendCommand());
         commands.put("exit", () -> exitApplication());
     }
 
@@ -115,8 +127,8 @@ public class Chat {
         System.out.println("connect <IP> <port> - Connect to another peer");
         System.out.println("list                - List active connections");
         System.out.println("terminate <ID>      - terminate connection"); //
-        System.out.println("send <ID> <message> - Send a new message"); // 
-        System.out.println("exit                - Exit the application"); // 
+        System.out.println("send <ID> <message> - Send a new message"); //
+        System.out.println("exit                - Exit the application"); //
 
     }
 
