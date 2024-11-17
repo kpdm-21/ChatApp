@@ -126,8 +126,8 @@ public class Chat {
         System.out.println("myport              - Display the port you are listening on");
         System.out.println("connect <IP> <port> - Connect to another peer");
         System.out.println("list                - List active connections");
-        System.out.println("terminate <ID>      - terminate connection"); //
-        System.out.println("send <ID> <message> - Send a new message"); //
+        System.out.println("terminate           - terminate connection"); //
+        System.out.println("send                - Send a new message"); //
         System.out.println("exit                - Exit the application"); //
 
     }
