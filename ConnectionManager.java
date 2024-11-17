@@ -1,9 +1,9 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.PrintWriter;
 
 /**
  * ConnectionManager manages multiple client connections, allowing connection addition
@@ -27,7 +27,7 @@ public class ConnectionManager {
 
             // retrieve local ip and port
             String localIP = InetAddress.getLocalHost().getHostAddress();
-            int localPort = Chat.serverSocket.getLocalPort();
+            int localPort = Chat.getServerSocket().getLocalPort();
 
             // check if trying to connect to self
             if (ip.equals(localIP) && port == localPort) {
@@ -45,14 +45,15 @@ public class ConnectionManager {
 
             // create a socket connection if all checks pass
             Socket socket = new Socket(address, port);
-            ConnectionHandler handler = new ConnectionHandler(socket);
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            writer.println("LISTEN_PORT:" + localPort);
+
+            ConnectionHandler handler = new ConnectionHandler(socket, port);
             addConnection(handler);
 
             System.out.println("Connected to " + ip + " on port " + port);
-        } catch (UnknownHostException e) {
-            System.out.println("Error: Invalid IP address.");
         } catch (IOException e) {
-            System.out.println("Error: Could not connect to " + ip + " on port " + port + ". Please check the IP address and port.");
+            System.out.println("Error: Unable to connect to " + ip + ":" + port);
         }
     }
 
@@ -62,7 +63,7 @@ public class ConnectionManager {
         System.out.println("-----------------------------------");
         for (int i = 0; i < connections.size(); i++) {
             ConnectionHandler handler = connections.get(i);
-            System.out.println((i + 1) + "     " + handler.getClientAddress() + "        " + handler.getClientPort());
+            System.out.println((i + 1) + "    " + handler.getClientAddress() + "    " + handler.getClientPort());
         }
     }
 
@@ -72,6 +73,7 @@ public class ConnectionManager {
             System.out.println("Error: Invalid connection ID.");
             return;
         }
+
         //// Get the connection handler
         ConnectionHandler handler = connections.get(id - 1);
         handler.closeConnection(); //// Close the socket
@@ -85,9 +87,14 @@ public class ConnectionManager {
             System.out.println("Error: Invalid connection ID.");
             return;
         }
+
         ConnectionHandler handler = connections.get(id - 1);
-        handler.sendMessageInner(message);
-        System.out.println("Message sent to " + handler.getClientAddress());
+        if (handler != null) {
+            System.out.println("Routing message to connection " + id + " (" + handler.getClientAddress() + ")");
+            handler.sendMessageInner(message);
+        } else {
+            System.out.println("Error: Connection with ID " + id + " does not exist.");
+        }
     }
 
     //// Related to Exit function and closes all connections
@@ -95,6 +102,7 @@ public class ConnectionManager {
         for (ConnectionHandler handler : connections) {
             handler.closeConnection();
         }
-        connections.clear(); // Clear the list of connections
+        connections.clear();
+        System.out.println("All connections closed."); // Clear the list of connections
     }
 }

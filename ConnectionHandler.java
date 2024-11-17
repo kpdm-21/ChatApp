@@ -12,15 +12,18 @@ public class ConnectionHandler {
     private Socket socket;
     private PrintWriter out;
     private String clientAddress;
+    private int remoteListeningPort; // added cause list command is messing up >.<
 
     // constructor, sets up the output stream and client's IP
-    public ConnectionHandler(Socket socket) {
+    public ConnectionHandler(Socket socket, int remoteListeningPort) {
         this.socket = socket;
         // retrieve and store the client's IP from socket
         this.clientAddress = socket.getInetAddress().getHostAddress();
+        // to make sure it receives correct port
+        this.remoteListeningPort = remoteListeningPort;
         try {
             // initializes output stream
-            out = new PrintWriter(socket.getOutputStream(), true);
+            this.out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,7 +36,12 @@ public class ConnectionHandler {
 
     // returns port number from connected peer
     public int getClientPort() {
-        return socket.getPort();
+        return remoteListeningPort;
+    }
+
+    // returns port access from connected peer
+    public Socket getSocket() {
+        return socket;
     }
 
     //// implement terminate command
@@ -46,9 +54,19 @@ public class ConnectionHandler {
             e.printStackTrace();
         }
     }
-    
-    //// implement send command
+
+    // sends message to connected peer by flushing the stream
     public void sendMessageInner(String message) {
-        out.println(message); ///// Send the message to the pair
+        try {
+            if (out != null) {
+                out.println(message);  // send the message
+                out.flush();           // ensure it’s sent immediately
+                System.out.println("Message sent to " + clientAddress);
+            } else {
+                System.out.println("Error: Output stream is not initialized.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error sending message to " + clientAddress + ": " + e.getMessage());
+        }
     }
 }
