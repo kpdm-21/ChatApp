@@ -78,4 +78,23 @@ public class ConnectionManager {
         connections.remove(id - 1); //// Remove from the list, it's a list right?
         System.out.println("Connection to " + handler.getClientAddress() + " terminated.");
     }
+
+    //// Sends message to specific connection
+    public void sendMessage(int id, String message) {
+        if (id < 1 || id > connections.size()) {
+            System.out.println("Error: Invalid connection ID.");
+            return;
+        }
+        ConnectionHandler handler = connections.get(id - 1);
+        handler.sendMessageInner(message);
+        System.out.println("Message sent to " + handler.getClientAddress());
+    }
+
+    //// Related to Exit function and closes all connections
+    public void closeAllConnections() {
+        for (ConnectionHandler handler : connections) {
+            handler.closeConnection();
+        }
+        connections.clear(); // Clear the list of connections
+    }
 }

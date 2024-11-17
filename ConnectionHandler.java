@@ -36,14 +36,19 @@ public class ConnectionHandler {
         return socket.getPort();
     }
 
-    // implement terminate command
+    //// implement terminate command
     public void closeConnection() {
         try {
-            //// Need the callout for later testing -sorry
+            //// Need the callout
             System.out.println("Connection to " + clientAddress + " has been closed.");
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    //// implement send command
+    public void sendMessageInner(String message) {
+        out.println(message); ///// Send the message to the pair
     }
 }

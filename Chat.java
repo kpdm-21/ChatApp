@@ -64,7 +64,9 @@ public class Chat {
         commands.put("myport", () -> System.out.println("Listening on port: " + serverSocket.getLocalPort()));
         commands.put("list", connectionManager::listConnections);
         commands.put("help", Chat::displayHelp);
-        ////commands.put("terminate", () -> processTerminateCommand());
+        commands.put("terminate", () -> processTerminateCommand());
+        commands.put("send", () -> processSendCommand()); 
+        commands.put("exit", () -> exitApplication());
     }
 
     // main loop to handle user commands and execute relevant actions
@@ -112,9 +114,9 @@ public class Chat {
         System.out.println("myport              - Display the port you are listening on");
         System.out.println("connect <IP> <port> - Connect to another peer");
         System.out.println("list                - List active connections");
-        System.out.println("terminate <ID>      - terminate connection"); // low run implementation
-        System.out.println("send <ID> <message> - Send a new message"); // not yet implemented
-        System.out.println("exit                - Exit the application"); // not yet implemented
+        System.out.println("terminate <ID>      - terminate connection"); //
+        System.out.println("send <ID> <message> - Send a new message"); // 
+        System.out.println("exit                - Exit the application"); // 
 
     }
 
@@ -148,9 +150,28 @@ public class Chat {
 
     //// Process the terminate command - v1
     private static void processTerminateCommand() {
-    Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter connection ID to terminate: ");
-    int connectionId = scanner.nextInt();
-    connectionManager.terminateConnection(connectionId);
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter connection ID to terminate: ");
+        int connectionId = scanner.nextInt();
+        connectionManager.terminateConnection(connectionId);
+    }
+
+    //// Process the send command - v1
+    private static void processSendCommand() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter connection ID to send message: ");
+        int connectionId = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline
+        System.out.print("Enter your message: ");
+        String message = scanner.nextLine();
+        connectionManager.sendMessage(connectionId, message);
+    }
+
+    //// Process to "exit" - v1
+    private static void exitApplication() {
+        System.out.println("Closing all connections...");
+        connectionManager.closeAllConnections();
+        System.out.println("Exiting the application.");
+        System.exit(0);
     }
 }
