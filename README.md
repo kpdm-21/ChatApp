@@ -16,17 +16,18 @@ ChatApp is a simple command-line-based chat application that allows users to con
 
 Member 1: Kristina Dela Merced
 
-	1.	Configured the Chat class to manage user commands, initialize the server, and handle incoming connections.
-	2.	Implemented commands:
+	1.	Configured the Chat class to manage user commands, and initialize the server.
+ 	2.	Configured TCP sockets, initialized server socket to listen for incoming connections, and continuously accepted incoming connections.
+	3.	Implemented commands
  	  •	help: Displays available commands and descriptions.
 	  •	myip: Displays the machine’s IP address.
 	  •	myport: Shows the server’s listening port.
 	  •	connect : Connects to a specified IP and port.
 	  •	list: Lists all active connections with IP and port details.
-	3.	Added error handling:
+	4.	Added error handling:
+	  •	Validate port numbers 
 	  •	Ensures connections are only made to valid IPs.
 	  •	Prevents self-connections and duplicates, with error messages.
-	4.	Structured the main command loop for clear user input processing.
 
 Member 2: Natalia Chavez
 
