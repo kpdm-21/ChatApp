@@ -30,7 +30,16 @@ Member 1: Kristina Dela Merced
 
 Member 2: Natalia Chavez
 
-  1. 
+  	1. Configured the existing classes to manage user notifications of incoming messages and connection(s) statuses.
+	2. Implemented Commands
+		• terminate: Closes/terminate the specific connection based on listed ID. Notifies the peer of the termination status.
+		• send: Sends a message to a specified connection based on the ID listed with up-to 100 characters long limit (includes whitespace).
+		• exit: Closes all connections and terminates this application. Notifies the peer(s) of the termination status to connections.
+	3. Added error handling:
+		• Prevents sending messages to non-existent connections, with error messages.
+		• Ensures messages are within the 100 character limit, with error messages.
+		• Ensures exit command reaches and relays termination status to all connections.
+	4. Provided editting/voiceover for Demo Video
 
 
 
@@ -51,10 +60,14 @@ Member 2: Natalia Chavez
 - Open a terminal or command prompt.
 - Navigate to the project directory where the `Makefile` and `.java` files are located.
 - Run the following command in the terminal to compile all Java files: make
+- Alternatively , you can compile all files by first inputting: javac Chat.java and then java Chat.java
 
 ### 3. Start the Program:
 - In the terminal, start the program with: make run port=<port>
 - Replace `<port>` with the desired port number (example: `make run port=4321`).
+
+- If using the alternatively method, you can start the program with: java Chat <port>
+- Replace `<port>` with the desired port number (example: `java Chat 4321`).
   
 ### 4. Using Commands in the Chat application:
 - Type `help` in the prompt to see available commands.
