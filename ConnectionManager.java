@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.PrintWriter;
@@ -25,6 +26,12 @@ public class ConnectionManager {
             // validate IP address format and port number
             InetAddress address = InetAddress.getByName(ip);
 
+            // Check if the port number is valid //nc
+            if (port < 1024 || port > 65535) {
+                System.out.println("Error: Unable to connect; invalid port number.");
+                return;
+            }
+            
             // retrieve local ip and port
             String localIP = InetAddress.getLocalHost().getHostAddress();
             int localPort = Chat.getServerSocket().getLocalPort();
@@ -55,6 +62,8 @@ public class ConnectionManager {
             new Thread(() -> Chat.handleIncomingMessages(handler)).start();
 
             System.out.println("Connected to " + ip + " on port " + port);
+        } catch (UnknownHostException e) {
+            System.out.println("Error: Unable to connect; invalid IP address.");
         } catch (IOException e) {
             System.out.println("Error: Unable to connect to " + ip + ":" + port);
         }
