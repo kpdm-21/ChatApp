@@ -127,10 +127,11 @@ public class ConnectionManager {
     //// Related to Exit function and closes all connections
     public void closeAllConnections() {
         for (ConnectionHandler handler : connections) {
-            handler.closeConnection();
+            handler.sendMessageInner("TERMINATE"); // Notify the peer about the termination
+            handler.closeConnection(); // Close the connection locally
         }
-        connections.clear();
-        System.out.println("All connections closed."); // Clear the list of connections
+        connections.clear(); // Clear the list of connections
+        System.out.println("All connections closed."); //Notify user
     }
 
     //// Returns the count of active connections

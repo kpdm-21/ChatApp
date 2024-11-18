@@ -274,10 +274,10 @@ public class Chat {
         }
     }
 
-    //// Process the "exit" -v1
+    //// Process the "exit"
     private static void exitApplication() {
         System.out.println("Closing all connections...");
-        connectionManager.closeAllConnections();
+        connectionManager.closeAllConnections(); // This will now send termination messages
         System.out.println("Exiting the application.");
         System.exit(0);
     }
