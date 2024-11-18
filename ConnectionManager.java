@@ -51,6 +51,9 @@ public class ConnectionManager {
             ConnectionHandler handler = new ConnectionHandler(socket, port);
             addConnection(handler);
 
+            // start a new thread to handle incoming messages from connected peer
+            new Thread(() -> Chat.handleIncomingMessages(handler)).start();
+
             System.out.println("Connected to " + ip + " on port " + port);
         } catch (IOException e) {
             System.out.println("Error: Unable to connect to " + ip + ":" + port);
@@ -74,11 +77,20 @@ public class ConnectionManager {
             return;
         }
 
-        //// Get the connection handler
+        // Get the connection handler
         ConnectionHandler handler = connections.get(id - 1);
-        handler.closeConnection(); //// Close the socket
-        connections.remove(id - 1); //// Remove from the list, it's a list right?
-        System.out.println("Connection to " + handler.getClientAddress() + " terminated.");
+        try {
+            // send the terminate signal to peer
+            handler.sendMessageInner("TERMINATE");
+            System.out.println("Termination signal sent to " + handler.getClientAddress());
+
+            // close the connection locally
+            handler.closeConnection();
+            connections.remove(id - 1); // Remove from the list
+            System.out.println("Connection to " + handler.getClientAddress() + " terminated.");
+        } catch (Exception e) {
+            System.out.println("Error terminating connection: " + e.getMessage());
+        }
     }
 
     //// Sends message to specific connection
@@ -88,10 +100,16 @@ public class ConnectionManager {
             return;
         }
 
+
         ConnectionHandler handler = connections.get(id - 1);
         if (handler != null) {
-            System.out.println("Routing message to connection " + id + " (" + handler.getClientAddress() + ")");
-            handler.sendMessageInner(message);
+            try {
+                handler.sendMessageInner(message); // send the message to the peer
+                // display confirmation message to the sender
+                System.out.println("Message sent to connection " + id);
+            } catch (Exception e) {
+                System.out.println("Error sending message to connection " + id + ": " + e.getMessage());
+            }
         } else {
             System.out.println("Error: Connection with ID " + id + " does not exist.");
         }
@@ -104,5 +122,16 @@ public class ConnectionManager {
         }
         connections.clear();
         System.out.println("All connections closed."); // Clear the list of connections
+    }
+
+    //// Returns the count of active connections
+    public int getActiveConnectionCount() {
+        return connections.size();
+    }
+
+    // remove connection for peer
+    public void removeConnection(ConnectionHandler handler) {
+        connections.remove(handler);
+        System.out.println("\nConnection with " + handler.getClientAddress() + " has been terminated by peer.");
     }
 }

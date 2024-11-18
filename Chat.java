@@ -5,7 +5,9 @@
  * Kristina Dela Merced
  */
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,7 +23,7 @@ import java.util.Scanner;
 public class Chat {
     // server socket to listen for incoming connections
     private static ServerSocket serverSocket;
-    // manges multiple peer connections
+    // manages multiple peer connections
     private static ConnectionManager connectionManager;
     // map of commands to their corresponding actions
     private static Map<String, Runnable> commands = new HashMap<>();
@@ -37,7 +39,6 @@ public class Chat {
         int port;
         try {
             port = Integer.parseInt(args[0]);
-            // error handling invalid port num
             if (port < 1024 || port > 65535) {
                 System.out.println("Error: Port must be between 1024 and 65535.");
                 return;
@@ -47,11 +48,11 @@ public class Chat {
             return;
         }
 
-        // initializes connection manager
+        // initialize connection manager
         connectionManager = new ConnectionManager();
 
         try {
-            // creates a server socket to listen on the specified port
+            // create a server socket to listen on the specified port
             serverSocket = new ServerSocket(port);
             System.out.println("Chat application started on port " + port);
             System.out.println("Type 'help' for available commands.");
@@ -59,17 +60,17 @@ public class Chat {
             // initialize command map with supported commands
             initializeCommands();
 
-            // starts a separate thread to accept incoming connections from peers
-            new Thread(() -> acceptConnections()).start();
+            // start a separate thread to accept incoming connections from peers
+            new Thread(Chat::acceptConnections).start();
 
-            //  main loop to process user commands from the console
+            // main loop to process user commands from the console
             processUserCommands();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // provides access to server socket for other parts of program
+    // provides access to the server socket for other parts of the program
     public static ServerSocket getServerSocket() {
         return serverSocket;
     }
@@ -105,7 +106,7 @@ public class Chat {
         }
     }
 
-    // processes commands that include arguments, like connect
+    // processes commands that include arguments, like "connect"
     private static void processCommandWithArgs(String command, String args) {
         if ("connect".equals(command)) {
             String[] connectArgs = args.split(" ");
@@ -133,8 +134,8 @@ public class Chat {
         System.out.println("myport              - Display the port you are listening on");
         System.out.println("connect <IP> <port> - Connect to another peer");
         System.out.println("list                - List active connections");
-        System.out.println("terminate           - Terminate a connection"); // still buggy
-        System.out.println("send                - Send a message to a connection"); // sorta eh
+        System.out.println("terminate           - Terminate a connection");
+        System.out.println("send                - Send a message to a connection");
         System.out.println("exit                - Exit the application");
     }
 
@@ -148,18 +149,19 @@ public class Chat {
         }
     }
 
-    // method to continuously accept incoming connections
+    // method to continiously accept incoming connections
     private static void acceptConnections() {
         while (true) {
             try {
-                // wait for a new connections
+                // wait for a new connection
                 Socket socket = serverSocket.accept();
                 int remoteListeningPort = -1;
 
                 // parse the client's listening port
-                Scanner input = new Scanner(socket.getInputStream());
-                while (input.hasNextLine()) {
-                    String line = input.nextLine();
+                // changed to bufferreader, might be more reliable IDK AT THIS POINT
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String line;
+                while ((line = input.readLine()) != null) {
                     if (line.startsWith("LISTEN_PORT:")) {
                         remoteListeningPort = Integer.parseInt(line.split(":")[1]);
                         break;
@@ -173,7 +175,7 @@ public class Chat {
                 // confirms connection output
                 System.out.println("Accepted connection from " + socket.getInetAddress().getHostAddress());
 
-                // Start a new thread to handle incoming messages
+                // start a new thread to handle incoming messages
                 new Thread(() -> handleIncomingMessages(handler)).start();
 
             } catch (IOException e) {
@@ -183,23 +185,35 @@ public class Chat {
     }
 
     // listens for incoming messages from a peer
-    private static void handleIncomingMessages(ConnectionHandler handler) {
+    public static void handleIncomingMessages(ConnectionHandler handler) {
         try {
             System.out.println("Listening for messages from " + handler.getClientAddress());
-            Scanner input = new Scanner(handler.getSocket().getInputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(handler.getSocket().getInputStream()));
 
-            while (true) {  // continuously listen for incoming messages
-                if (input.hasNextLine()) {
-                    String message = input.nextLine();
-                    System.out.println("Message received from " + handler.getClientAddress() + ": " + message);
+            String message;
+            while ((message = reader.readLine()) != null) {
+                if (message.equals("TERMINATE")) {
+                    // receiving side
+                    System.out.println("Connection terminated by " + handler.getClientAddress());
+                    handler.closeConnection(); // close the connection locally
+                    connectionManager.removeConnection(handler); // remove it from the list
+                    break; // exit the listening loop
+                } else {
+                    // display the message along with sender information
+                    System.out.println("\nMessage received from " + handler.getClientAddress());
+                    System.out.println("Sender’s Port: " + handler.getClientPort());
+                    System.out.println("Message: \"" + message + "\"");
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error reading messages from " + handler.getClientAddress() + ": " + e.getMessage());
+            // fix error during intentional termination
+            if (!e.getMessage().equals("Socket closed")) {
+                System.out.println("Error reading messages from " + handler.getClientAddress() + ": " + e.getMessage());
+            }
         }
     }
 
-    //// Process the terminate command - v1
+    //// Process the terminate command
     private static void processTerminateCommand() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter connection ID to terminate: ");
@@ -207,25 +221,60 @@ public class Chat {
         connectionManager.terminateConnection(connectionId);
     }
 
-    //// Process the send command - v1
+    //// Process the send command
     private static void processSendCommand() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter connection ID to send message: ");
-        int connectionId = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline
-        System.out.print("Enter your message: ");
-        String message = scanner.nextLine();
+        String inputId = scanner.nextLine();
 
-        // error handling
-        if (message.length() > 100) {
-            System.out.println("Error: Message exceeds 100 characters. Please shorten it.");
+        // error handling connection ID
+        int connectionId;
+        try {
+            connectionId = Integer.parseInt(inputId);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Connection ID must be an integer.");
             return;
         }
 
-        connectionManager.sendMessage(connectionId, message);
+        if (!isValidConnectionId(connectionId)) {
+            System.out.println("Error: Invalid connection ID.");
+            return;
+        }
+
+        // prompt user for message
+        System.out.print("Enter your message: ");
+        String message = scanner.nextLine();
+
+        // validate message
+        if (!isValidMessage(message)) {
+            System.out.println("Error: Message must be 1-100 characters long.");
+            return;
+        }
+
+        // send the message
+        sendMessageToConnection(connectionId, message);
     }
 
-    //// Process to "exit" - v1
+    // validate the connection ID
+    private static boolean isValidConnectionId(int connectionId) {
+        return connectionId >= 1 && connectionId <= connectionManager.getActiveConnectionCount();
+    }
+
+    // validate the message
+    private static boolean isValidMessage(String message) {
+        return message != null && !message.trim().isEmpty() && message.length() <= 100;
+    }
+
+    // send the message to the connection
+    private static void sendMessageToConnection(int connectionId, String message) {
+        try {
+            connectionManager.sendMessage(connectionId, message);
+        } catch (Exception e) {
+            System.out.println("Error: Failed to send message. " + e.getMessage());
+        }
+    }
+
+    //// Process the "exit" -v1
     private static void exitApplication() {
         System.out.println("Closing all connections...");
         connectionManager.closeAllConnections();

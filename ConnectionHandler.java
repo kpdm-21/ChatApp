@@ -47,8 +47,6 @@ public class ConnectionHandler {
     //// implement terminate command
     public void closeConnection() {
         try {
-            //// Need the callout
-            System.out.println("Connection to " + clientAddress + " has been closed.");
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,7 +59,6 @@ public class ConnectionHandler {
             if (out != null) {
                 out.println(message);  // send the message
                 out.flush();           // ensure it’s sent immediately
-                System.out.println("Message sent to " + clientAddress);
             } else {
                 System.out.println("Error: Output stream is not initialized.");
             }
