@@ -90,7 +90,7 @@ public class Chat {
     private static void processUserCommands() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter command: ");
+            System.out.print("\nEnter command: ");
             String command = scanner.nextLine();
 
             // splits the command to check for arguments
@@ -173,7 +173,7 @@ public class Chat {
                 connectionManager.addConnection(handler);
 
                 // confirms connection output
-                System.out.println("Accepted connection from " + socket.getInetAddress().getHostAddress());
+                System.out.println("\nAccepted connection from " + socket.getInetAddress().getHostAddress() );
 
                 // start a new thread to handle incoming messages
                 new Thread(() -> handleIncomingMessages(handler)).start();
@@ -187,7 +187,7 @@ public class Chat {
     // listens for incoming messages from a peer
     public static void handleIncomingMessages(ConnectionHandler handler) {
         try {
-            System.out.println("Listening for messages from " + handler.getClientAddress());
+            System.out.println("\nListening for messages from " + handler.getClientAddress());
             BufferedReader reader = new BufferedReader(new InputStreamReader(handler.getSocket().getInputStream()));
 
             String message;
@@ -201,7 +201,7 @@ public class Chat {
                 } else {
                     // display the message along with sender information
                     System.out.println("\nMessage received from " + handler.getClientAddress());
-                    System.out.println("Sender’s Port: " + handler.getClientPort());
+                    System.out.println("Sender\'s Port" + handler.getClientPort());
                     System.out.println("Message: \"" + message + "\"");
                 }
             }
