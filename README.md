@@ -5,8 +5,8 @@ COMP429 Programming Assignment - A Chat Application for Remote Message Exchange
 # Project Group 3
 
 Members:
-Kristina Dela Merced
-Natalia Chavez 
+Kristina 
+Natalia 
 
 # Project Overview
 
@@ -14,7 +14,7 @@ ChatApp is a simple command-line-based chat application that allows users to con
 
 # Team Contributions
 
-Member 1: Kristina Dela Merced
+Member 1: Kristina
 
 	1.	Configured the Chat class to manage user commands, and initialize the server.
  	2.	Configured TCP sockets, initialized server socket to listen for incoming connections, and continuously accepted incoming connections.
@@ -29,7 +29,7 @@ Member 1: Kristina Dela Merced
 	  •	Ensures connections are only made to valid IPs.
 	  •	Prevents self-connections and duplicates, with error messages.
 
-Member 2: Natalia Chavez
+Member 2: Natalia 
 
   	1. Configured the existing classes to manage user notifications of incoming messages and connection(s) statuses.
 	2. Implemented Commands
